@@ -27,22 +27,58 @@ class FlockingAgent(Agent):
         direction = Vector2(1, 0).rotate(angle).normalize()
         self.move = direction * self.config.movement_speed
 
-def change_position(self):
+    def change_position(self):
         self.there_is_no_escape()
+        v_align = Vector2()
+        v_cohesion = Vector2()
+        v_sep = Vector2()
 
-
-        pairs = self.in_proximity_accuracy()
-        neighbours = [agent for agent, dist in pairs]
+        # get neighbours nearby
+        neighbours = list(self.in_proximity_accuracy())
+        num_neighbours = len(neighbours)
 
         # if there are no neighbours, move straight at current velocity
-        if not neighbours:
+        if num_neighbours == 0:
             # cap speed if it exceeds movement speed
             if self.move.length() > self.config.movement_speed:
                 self.move = self.move.normalize() * self.config.movement_speed
             # update pos by current velocity
             self.pos += self.move
             return
+        else:
+            for n, dist in neighbours:
+                # for alignment, sum the neighbouring boids velocities
+                v_align += n.move
+                # for cohesion sum the positions
+                v_cohesion += n.pos
+                # for seperation, move boids that are too close away
+                if dist < 25:
+                    space = self.pos - n.pos
+                    if space.length_squared() > 0:
+                        # inverse square repulsion is stroger when the boids are closer
+                        v_sep += space.normalize() / (space * space)
 
+            # finish calculations & normalize
+            v_align /= num_neighbours
+            v_cohesion = (v_cohesion / num_neighbours) - self.pos
+            if v_align.length_squared() != 0:
+                v_align = v_align.normalize()
+            if v_cohesion.length_squared() != 0:
+                v_cohesion = v_cohesion.normalize()
+            if v_sep.length_squared() != 0:
+                v_sep = v_sep.normalize()
+
+            final_alignment = v_align * self.config.alignment_weight
+            final_sep = v_sep * self.config.separation_weight
+            final_cohesion = v_cohesion * self.config.cohesion_weight
+
+            aim = (final_alignment + final_cohesion + final_sep)
+
+            if aim.length_squared() > 0:
+                self.move = self.config.movement_speed * aim.normalize()
+        self.pos += self.move
+
+'''
         # alignment (steer toward the average velocity of neighbors) ####
         avg_velocity = Vector2(0, 0)
         for nbr in neighbours:
@@ -84,18 +120,20 @@ def change_position(self):
         if self.move.length() > speed_limit:
             self.move = self.move.normalize() * speed_limit
 
-        # update position by new velocity
+        # update position by new velocity 
         self.pos += self.move  # Xboid = Xboid + Vboid · Δt  (Δt = 1)  :contentReference[oaicite:4]{index=4}
 
-
-
+'''
 (
     Simulation(
         # TODO: Modify `movement_speed` and `radius` and observe the change in behaviour.
         FlockingConfig(
             image_rotation=True,
             movement_speed=1,
-            radius=50)
+            radius=50,
+            alignment_weight=1,
+            cohesion_weight=1,
+            separation_weight=2)
     )
     .batch_spawn_agents(100, FlockingAgent, images=["images/triangle.png"])
     .run()
