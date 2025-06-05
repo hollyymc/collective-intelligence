@@ -7,7 +7,7 @@ class FlockingConfig(Config):
     # TODO: Modify the weights and observe the change in behaviour.
     alignment_weight: float = 1
     cohesion_weight: float = 1
-    separation_weight: float = 1
+    separation_weight: float = 1.5 # higher to stop overlapping
 
 
 # class FlockingAgent(Agent[FlockingConfig]): this line stops me running it
@@ -45,7 +45,8 @@ class FlockingAgent(Agent):
             displacement = self.pos - nbr.pos
             dist = displacement.length()
             if dist > 0:
-                separation_force += displacement.normalize() / dist
+                separation_force += displacement.normalize() / (dist**2)
+        separation_force *= 10
 
         # Cohesion (steer toward the center of mass of neighbors)
         # Compute average position XN of neighbors
