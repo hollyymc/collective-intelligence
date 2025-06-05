@@ -10,7 +10,8 @@ class FlockingConfig(Config):
     separation_weight: float = 1
 
 
-class FlockingAgent(Agent[FlockingConfig]):
+# class FlockingAgent(Agent[FlockingConfig]): this line stops me running it
+class FlockingAgent(Agent):
     # By overriding `change_position`, the default behaviour is overwritten.
     # Without making changes, the agents won't move.
     def change_position(self):
@@ -42,7 +43,7 @@ class FlockingAgent(Agent[FlockingConfig]):
         separation_force = Vector2(0, 0)
         for nbr in neighbours:
             displacement = self.pos - nbr.pos
-            dist = displacement.length
+            dist = displacement.length()
             if dist > 0:
                 separation_force += displacement.normalize() / dist
 
