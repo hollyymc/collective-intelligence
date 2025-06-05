@@ -7,11 +7,9 @@ import random
 class FlockingConfig(Config):
     # TODO: Modify the weights and observe the change in behaviour.
     alignment_weight: float = 1
-    cohesion_weight: float = 1
+    cohesion_weight: float = 1.5
     separation_weight: float = 2 # higher to stop clustering
 
-    # vi base config also wants:
-    mass = 15
 
 
 # class FlockingAgent(Agent[FlockingConfig]): this line stops me running it
@@ -129,7 +127,7 @@ class FlockingAgent(Agent):
         # TODO: Modify `movement_speed` and `radius` and observe the change in behaviour.
         FlockingConfig(
             image_rotation=True,
-            movement_speed=1,
+            movement_speed=1.75, #increased because they took a long time to flock
             radius=50,
             alignment_weight=1,
             cohesion_weight=1,
