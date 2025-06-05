@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-
 from vi import Agent, Config, Simulation
 from pygame.math import Vector2
 
@@ -20,7 +19,7 @@ class FlockingAgent(Agent[FlockingConfig]):
         # TODO: Modify self.move and self.pos accordingly.
 
         pairs = self.in_proximity_accuracy()
-        neighbours = [agent for(agent, dist) in pairs]
+        neighbours = [agent for agent, dist in pairs]
 
         # if there are no neighbours, move straight at current velocity
         if not neighbours:
@@ -36,15 +35,16 @@ class FlockingAgent(Agent[FlockingConfig]):
         for nbr in neighbours:
             avg_velocity += nbr.move
         avg_velocity /= len(neighbours)
+        alignment_force = avg_velocity - self.move # steering component
 
-        # Steering component
-        alignment_force = avg_velocity - self.move
-
-        # separation (steer away from neighbors that are too close) ####
+        # separation (steer away from neighbors that are too close)
+        # force is stronger the closer neighbours are (base weight on distance)
         separation_force = Vector2(0, 0)
         for nbr in neighbours:
-            separation_force += (self.pos - nbr.pos)
-        separation_force /= len(neighbours)
+            displacement = self.pos - nbr.pos
+            dist = displacement.length
+            if dist > 0:
+                separation_force += displacement.normalize() / dist
 
         # Cohesion (steer toward the center of mass of neighbors)
         # Compute average position XN of neighbors
@@ -52,7 +52,6 @@ class FlockingAgent(Agent[FlockingConfig]):
         for nbr in neighbours:
             center_of_mass += nbr.pos
         center_of_mass /= len(neighbours)
-
         # Cohesion force
         cohesion_force = (center_of_mass - self.pos) - self.move
 
