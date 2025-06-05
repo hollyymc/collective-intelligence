@@ -1,23 +1,35 @@
 from dataclasses import dataclass
 from vi import Agent, Config, Simulation
 from pygame.math import Vector2
+import random
 
 @dataclass
 class FlockingConfig(Config):
     # TODO: Modify the weights and observe the change in behaviour.
     alignment_weight: float = 1
     cohesion_weight: float = 1
-    separation_weight: float = 1.5 # higher to stop overlapping
+    separation_weight: float = 2 # higher to stop clustering
+
+    # vi base config also wants:
+    mass = 15
 
 
 # class FlockingAgent(Agent[FlockingConfig]): this line stops me running it
 class FlockingAgent(Agent):
     # By overriding `change_position`, the default behaviour is overwritten.
     # Without making changes, the agents won't move.
-    def change_position(self):
+    def starting(self):
+        """
+        called when a boid is created
+        selects an angle, is normalized and starts the agent moving
+        """
+        angle = random.uniform(0, 360)
+        direction = Vector2(1, 0).rotate(angle).normalize()
+        self.move = direction * self.config.movement_speed
+
+def change_position(self):
         self.there_is_no_escape()
 
-        # TODO: Modify self.move and self.pos accordingly.
 
         pairs = self.in_proximity_accuracy()
         neighbours = [agent for agent, dist in pairs]
@@ -80,7 +92,10 @@ class FlockingAgent(Agent):
 (
     Simulation(
         # TODO: Modify `movement_speed` and `radius` and observe the change in behaviour.
-        FlockingConfig(image_rotation=True, movement_speed=1, radius=50)
+        FlockingConfig(
+            image_rotation=True,
+            movement_speed=1,
+            radius=50)
     )
     .batch_spawn_agents(100, FlockingAgent, images=["images/triangle.png"])
     .run()
