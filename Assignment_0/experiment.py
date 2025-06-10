@@ -9,8 +9,7 @@ class FlockingConfig(Config):
     alignment_weight: float = 1
     cohesion_weight: float = 1.5
     separation_weight: float = 2 # higher to stop clustering
-
-
+    obstacle_weight: float = 5
 
 # class FlockingAgent(Agent[FlockingConfig]): this line stops me running it
 class FlockingAgent(Agent):
@@ -26,17 +25,30 @@ class FlockingAgent(Agent):
         self.move = direction * self.config.movement_speed
 
     def change_position(self):
-        self.there_is_no_escape()
         v_align = Vector2()
         v_cohesion = Vector2()
         v_sep = Vector2()
+        v_obstacle = Vector2()
 
         # get neighbours nearby
         neighbours = list(self.in_proximity_accuracy())
         num_neighbours = len(neighbours)
 
+        # obstacle avoidance
+        obstacle_intersections = list(self.obstacle_intersections())
+        if obstacle_intersections:
+            for intersection in obstacle_intersections:
+                avoid_direction = self.pos - intersection
+                if avoid_direction.length_squared() > 0:
+                    v_obstacle += avoid_direction.normalize()
+
         # if there are no neighbours, move straight at current velocity
         if num_neighbours == 0:
+            # add obstacle avoidance
+            if v_obstacle.length_squared() > 0:
+                v_obstacle = v_obstacle.normalize()
+                self.move += v_obstacle * self.config.obstacle_weight
+            
             # cap speed if it exceeds movement speed
             if self.move.length() > self.config.movement_speed:
                 self.move = self.move.normalize() * self.config.movement_speed
@@ -54,7 +66,7 @@ class FlockingAgent(Agent):
                     space = self.pos - n.pos
                     if space.length_squared() > 0:
                         # inverse square repulsion is stroger when the boids are closer
-                        v_sep += space.normalize() / (space * space)
+                        v_sep += space.normalize() / (dist * dist + 1)
 
             # finish calculations & normalize
             v_align /= num_neighbours
@@ -65,74 +77,85 @@ class FlockingAgent(Agent):
                 v_cohesion = v_cohesion.normalize()
             if v_sep.length_squared() != 0:
                 v_sep = v_sep.normalize()
+            if v_obstacle.length_squared() > 0:
+                v_obstacle = v_obstacle.normalize()
 
             final_alignment = v_align * self.config.alignment_weight
             final_sep = v_sep * self.config.separation_weight
             final_cohesion = v_cohesion * self.config.cohesion_weight
+            final_obstacle = v_obstacle * self.config.obstacle_weight
 
-            aim = (final_alignment + final_cohesion + final_sep)
+            aim = (final_alignment + final_cohesion + final_sep + final_obstacle)
 
             if aim.length_squared() > 0:
                 self.move = self.config.movement_speed * aim.normalize()
         self.pos += self.move
 
-'''
-        # alignment (steer toward the average velocity of neighbors) ####
-        avg_velocity = Vector2(0, 0)
-        for nbr in neighbours:
-            avg_velocity += nbr.move
-        avg_velocity /= len(neighbours)
-        alignment_force = avg_velocity - self.move # steering component
-
-        # separation (steer away from neighbors that are too close)
-        # force is stronger the closer neighbours are (base weight on distance)
-        separation_force = Vector2(0, 0)
-        for nbr in neighbours:
-            displacement = self.pos - nbr.pos
-            dist = displacement.length()
-            if dist > 0:
-                separation_force += displacement.normalize() / (dist**2)
-        separation_force *= 10
-
-        # Cohesion (steer toward the center of mass of neighbors)
-        # Compute average position XN of neighbors
-        center_of_mass = Vector2(0, 0)
-        for nbr in neighbours:
-            center_of_mass += nbr.pos
-        center_of_mass /= len(neighbours)
-        # Cohesion force
-        cohesion_force = (center_of_mass - self.pos) - self.move
-
-        # Combine the three forces (no mass term since we assume Mboid = 1)
-        total_force = (
-            (self.config.alignment_weight * alignment_force)
-            + (self.config.cohesion_weight * cohesion_force)
-            + (self.config.separation_weight * separation_force)
-        )
-
-        # Update velocity
-        self.move += total_force
-
-        # Enforce speed limit (movement_speed) and normalize direction
-        speed_limit = self.config.movement_speed
-        if self.move.length() > speed_limit:
-            self.move = self.move.normalize() * speed_limit
-
-        # update position by new velocity 
-        self.pos += self.move  # Xboid = Xboid + Vboid · Δt  (Δt = 1)  :contentReference[oaicite:4]{index=4}
-
-'''
-(
-    Simulation(
-        # TODO: Modify `movement_speed` and `radius` and observe the change in behaviour.
+def create_simulation_base():
+    return Simulation(
         FlockingConfig(
             image_rotation=True,
-            movement_speed=1.75, #increased because they took a long time to flock
+            movement_speed=1.75,
             radius=50,
             alignment_weight=1,
             cohesion_weight=1,
-            separation_weight=2)
-    )
-    .batch_spawn_agents(100, FlockingAgent, images=["images/triangle.png"])
-    .run()
-)
+            separation_weight=2,
+            obstacle_weight=5)
+    ).batch_spawn_agents(100, FlockingAgent, images=["images/triangle.png"])
+
+def u_shape():
+    sim = create_simulation_base()
+    # Left side of U
+    for y in range(150, 550, 50):
+        sim = sim.spawn_obstacle("images/triangle@50px.png", 200, y)
+    # Bottom of U
+    for x in range(250, 550, 50):
+        sim = sim.spawn_obstacle("images/triangle@50px.png", x, 500)
+    # Right side of U
+    for y in range(150, 550, 50):
+        sim = sim.spawn_obstacle("images/triangle@50px.png", 550, y)
+    return sim
+
+def x_shape():
+    sim = create_simulation_base()
+    # Diagonal from top-left to bottom-right
+    for i in range(8):
+        x = 200 + i * 50
+        y = 150 + i * 50
+        sim = sim.spawn_obstacle("images/triangle@50px.png", x, y)
+    # Diagonal from top-right to bottom-left
+    for i in range(8):
+        x = 550 - i * 50
+        y = 150 + i * 50
+        sim = sim.spawn_obstacle("images/triangle@50px.png", x, y)
+    return sim
+
+def vertical_line():
+    sim = create_simulation_base()
+    for y in range(100, 650, 50):
+        sim = sim.spawn_obstacle("images/triangle@50px.png", 375, y)
+    return sim
+
+def square():
+    sim = create_simulation_base()
+    # Top and bottom
+    for x in range(250, 500, 50):
+        sim = sim.spawn_obstacle("images/triangle@50px.png", x, 200)
+        sim = sim.spawn_obstacle("images/triangle@50px.png", x, 450)
+    # Left and right
+    for y in range(250, 401, 50):
+        sim = sim.spawn_obstacle("images/triangle@50px.png", 250, y)
+        sim = sim.spawn_obstacle("images/triangle@50px.png", 450, y)
+    return sim
+
+# Choose which simulation to run
+choice = "square"  # Change to "x", "line", or "square"
+
+if choice == "u":
+    u_shape().run()
+elif choice == "x":
+    x_shape().run()
+elif choice == "line":
+    vertical_line().run()
+elif choice == "square":
+    square().run()
