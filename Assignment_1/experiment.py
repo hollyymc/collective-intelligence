@@ -12,7 +12,7 @@ def run_experiment(site_images):
     cx, cy = w // 2, h // 2
 
     sim.spawn_obstacle("images/frame.png", cx, cy)
-    
+
     offsets = [-150, +150]
 
     for img, dx in zip(site_images, offsets):
@@ -27,6 +27,6 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     if args.experiment == 1:
-        run_experiment(["images/circle-256.png", "images/circle-256.png"])
+        run_experiment(["images/site.png", "images/site.png"])
     else:
-        run_experiment(["images/circle-128.png", "images/circle-256.png"])
+        run_experiment(["images/site-small.png", "images/site.png"])
