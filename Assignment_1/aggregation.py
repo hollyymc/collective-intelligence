@@ -59,8 +59,8 @@ if __name__ == "__main__":
     cx, cy      = w // 2, h // 2
 
     sim.spawn_obstacle("images/frame.png", cx, cy)
-    sim.spawn_site("images/site.png", cx - 100, cy)
-    sim.spawn_site("images/site.png", cx + 100, cy)
+    sim.spawn_site("images/circle-256.png", cx - 150, cy)
+    sim.spawn_site("images/circle-256.png", cx + 150, cy)
 
     sim.batch_spawn_agents(50, Cockroach, images=["images/cockroach.png"])
     sim.run()
