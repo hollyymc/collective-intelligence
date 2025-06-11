@@ -48,6 +48,7 @@ class Cockroach(Agent):
             self.timer += 1
             if self.timer >= self.config.Tleave:
                 self.state = "wandering"
+        
 
 
 if __name__ == "__main__":
@@ -56,6 +57,8 @@ if __name__ == "__main__":
 
     w, h        = cfg.window.as_tuple()
     cx, cy      = w // 2, h // 2
+
+    sim.spawn_obstacle("images/frame.png", cx, cy)
     sim.spawn_site("images/site.png", cx - 100, cy)
     sim.spawn_site("images/site.png", cx + 100, cy)
 
