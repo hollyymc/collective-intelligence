@@ -3,16 +3,23 @@
 import random
 from vi import Agent, Config, Simulation
 from vi.util import count
+import math
 
 def make_base_config():
     cfg = Config()
-    cfg.Tjoin  = 20
-    cfg.Tleave = 20
-    cfg.D      = 5
-    cfg.Pjoin  = staticmethod(lambda n: min(1.0, 0.3 + 0.05 * n))
-    cfg.Pleave = staticmethod(lambda n: max(0.0, 0.5 - 0.05 * n))
-    return cfg
+    cfg.seed   = 42  
 
+    cfg.Tjoin  = 36
+    cfg.Tleave = 20
+    cfg.D      = 20
+
+
+    # join probability
+    cfg.Pjoin  = staticmethod(lambda n: min(1.0, 0.8 + 0.05 * n))
+    # leave probability
+    cfg.Pleave = staticmethod(lambda n: max(0.01, 0.1 - 0.02 * n))
+
+    return cfg
 
 class Cockroach(Agent):
     """PFSM agent with wandering, joining, still, leaving states."""
@@ -21,17 +28,25 @@ class Cockroach(Agent):
         self.state = "wandering"
         self.timer = 0
 
+
     def update(self) -> None:
+        # random walk in all states except STILL
+        if self.state in ("wandering", "joining", "leaving"):
+            super().update()   
+
+        # transitions
         if self.state == "wandering":
             if self.on_site():
                 n = count(self.in_proximity_accuracy())
                 if random.random() < self.config.Pjoin(n):
                     self.state = "joining"
-                    self.timer = 0
+                    noise = random.gauss(0, 5)
+                    self.timer = max(1, int(self.config.Tjoin + noise))
+
 
         elif self.state == "joining":
-            self.timer += 1
-            if self.timer >= self.config.Tjoin:
+            self.timer -= 1
+            if self.timer <= 0:
                 self.state = "still"
                 self.freeze_movement()
 
@@ -41,13 +56,14 @@ class Cockroach(Agent):
                 n = count(self.in_proximity_accuracy())
                 if random.random() < self.config.Pleave(n):
                     self.state = "leaving"
-                    self.timer = 0
                     self.continue_movement()
-
+                    self.timer = self.config.Tleave
+                 
         elif self.state == "leaving":
-            self.timer += 1
-            if self.timer >= self.config.Tleave:
+            self.timer -= 1
+            if self.timer <= 0:
                 self.state = "wandering"
+
         
 
 
@@ -58,9 +74,10 @@ if __name__ == "__main__":
     w, h        = cfg.window.as_tuple()
     cx, cy      = w // 2, h // 2
 
+
     sim.spawn_obstacle("images/frame.png", cx, cy)
-    sim.spawn_site("images/circle-256.png", cx - 150, cy)
-    sim.spawn_site("images/circle-256.png", cx + 150, cy)
+    sim.spawn_site("images/site-normal.png", cx - 100, cy)
+    sim.spawn_site("images/site-normal.png", cx + 100, cy)
 
     sim.batch_spawn_agents(50, Cockroach, images=["images/cockroach.png"])
     sim.run()
