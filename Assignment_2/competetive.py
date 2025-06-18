@@ -11,6 +11,8 @@ class LotkaVolterraConfig(Config):
     fox_hunt_radius: float = 10
     movement_speed: float = 2.0
     rabbit_reproduction_prob: float = 0.005
+    fox_start_energy: int = 300
+    fox_energy_gain_on_eat: int = 150
 
 class PopulationTracker:
     def __init__(self):
@@ -86,12 +88,6 @@ class Rabbit(Agent):
         self.move = Vector2(1, 0).rotate(angle) * self.config.movement_speed
         
     def change_position(self):
-        if not hasattr(self, 'species'):
-            self.species = "rabbit"
-        if not hasattr(self, 'move'):
-            angle = random.uniform(0, 360)
-            self.move = Vector2(1, 0).rotate(angle) * self.config.movement_speed
-            
         # Move randomly
         if random.random() < 0.1:
             self.move = self.move.rotate(random.uniform(-30, 30))
@@ -107,23 +103,15 @@ class Fox(Agent):
     def __init__(self, images, simulation, pos=None, move=None):
         super().__init__(images, simulation, pos, move)
         self.species = "fox"
-        self.energy = 300
+        self.energy = self.config.fox_start_energy
         
     def starting(self):
         self.species = "fox"
-        self.energy = 300
+        self.energy = self.config.fox_start_energy
         angle = random.uniform(0, 360)
         self.move = Vector2(1, 0).rotate(angle) * self.config.movement_speed
         
     def change_position(self):
-        if not hasattr(self, 'species'):
-            self.species = "fox"
-        if not hasattr(self, 'energy'):
-            self.energy = 300
-        if not hasattr(self, 'move'):
-            angle = random.uniform(0, 360)
-            self.move = Vector2(1, 0).rotate(angle) * self.config.movement_speed
-            
         # Check for random death FIRST
         if random.random() < self.config.fox_death_prob:
             self.kill()
@@ -136,7 +124,7 @@ class Fox(Agent):
             if hasattr(agent, 'species') and agent.species == "rabbit":
                 if distance <= self.config.fox_hunt_radius:
                     agent.kill()
-                    self.energy += 150
+                    self.energy += self.config.fox_energy_gain_on_eat
                     self.reproduce()
                     break
         
@@ -187,7 +175,9 @@ if __name__ == "__main__":
         fox_death_prob=0.01,
         fox_hunt_radius=40,
         rabbit_reproduction_prob=0.005,
-        duration=2000
+        duration=1000,
+        fox_start_energy=300,
+        fox_energy_gain_on_eat=150
     )
     
     simulation = LotkaVolterraSimulation(config)
