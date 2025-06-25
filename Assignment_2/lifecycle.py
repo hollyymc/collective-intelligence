@@ -21,7 +21,7 @@ class LotkaVolterraConfig(Config):
     # Disable metrics to avoid polars error
     enable_logging: bool = False
     enable_recording: bool = False
-    duration: int = 1000  # Simulation duration in steps
+    duration: int = 15000  # Simulation duration in steps
 
 
 class PopulationTracker:
@@ -86,8 +86,8 @@ class PopulationTracker:
         plt.grid(True, alpha=0.3)
 
         plt.tight_layout()
-        plt.savefig('population_dynamics.png', dpi=300, bbox_inches='tight')
-        print("Plot saved as 'population_dynamics.png'")
+        plt.savefig('population_dynamics_lifecycle.png', dpi=300, bbox_inches='tight')
+        print("Plot saved as 'population_dynamics_lifecycle.png'")
         plt.close()
 
         # Print basic statistics

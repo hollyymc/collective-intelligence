@@ -14,6 +14,7 @@ class LotkaVolterraConfig(Config):
     rabbit_reproduction_prob: float = 0.005
     fox_start_energy: int = 0
     fox_energy_gain_on_eat: int = 0
+    duration: int = 15000  # Simulation duration in steps
 
 
 class PopulationTracker:

@@ -18,6 +18,7 @@ class LotkaVolterraConfig(Config):
     rabbit_energy_gain_on_eat: int = 0
     rabbit_feed_radius: int = 10
     grass_reproduction_prob: float = 0.005
+    duration: int = 15000  # Simulation duration in steps
 
 
 class PopulationTracker:
