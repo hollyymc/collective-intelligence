@@ -114,24 +114,25 @@
 
 ## Interpretation
 
-**steps_survived**
+### steps_survived
 Both models exhibited virtually identical survival times (Baseline: 2 995 ± 12 steps; Life-Cycle: 3 002 ± 11 steps), and neither the t-test (p = 0.42) nor the Mann–Whitney test (p = 0.42) found a statistically significant difference.
 
 Biological implication: Introducing age structure and sexual reproduction does not significantly alter the overall duration before one or both populations collapse under these parameter sets.
 
 
-**final_rabbits, final_foxes**
+### final_rabbits, final_foxes
 On average, both models ended with only a handful of survivors: roughly 5–6 rabbits and 4–5 foxes per run. Statistical tests confirm no meaningful difference (all p-values > 0.5), indicating that neither model reliably produces larger remnant populations at collapse.
 
 Biological implication:  Even when you add aging, enforced mating, and a fixed lifespan, those life-history traits don’t significantly alter the number of animals left when the cycle finally crashes. Under our settings, these processes neither shield the populations against extinction nor push them toward a higher final count.
 
-**min_rabbits, min_foxes**
+
+### min_rabbits, min_foxes
 In both simulations, rabbits dipped to about 1 or fewer on average (baseline ~0.8, life-cycle ~1.2; p ≈ 0.33), and foxes similarly sank to around half an individual (baseline ~0.6, life-cycle ~0.3; p ≈ 0.25). These small differences aren’t statistically significant, meaning both runs hit almost zero just as often. Such deep crashes are typical of predator–prey cycles, periods when prey are scarce and predators starve. They show up regardless of added lifecycle rules.
 
 Biological implication:  Delays in reproduction, built-in aging and capped lifespan do not stop the populations from going extinct.
 
 
-**max_rabbits, max_foxes**
+### max_rabbits, max_foxes
 in the baseline model, the highest rabbit count averaged 98.7 ± 2.5, whereas the life-cycle model reached 100.2 ± 1.9. This increase is statistically significant (p ≈ 0.015). Peak fox numbers dropped from 26.8 ± 4.5 in the baseline to 22.1 ± 3.8 with life-cycle rules, a highly significant decrease (p ≈ 0.002).
 
 Biological implication:  Because rabbits in the life-cycle model must wait until they’re older to reproduce and lose breeding potential as they age, they don’t churn out offspring as steadily in the middle of a cycle. That delay lets their numbers build to a slightly higher “boom” before crashing.
