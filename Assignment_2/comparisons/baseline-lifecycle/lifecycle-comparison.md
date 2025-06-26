@@ -57,52 +57,59 @@
 ### Statistical analysis
 
 **steps_survived**
-BASELINE: mean = 2995.2, SD = 12.3, 95% CI = [2980.1, 3010.3]
-LIFE-CYCLE: mean = 3001.5, SD = 10.8, 95% CI = [2987.4, 3015.6]
-t-test p-value = 0.4231
-Mann–Whitney p-value = 0.4150
+
+    BASELINE: mean = 2995.2, SD = 12.3, 95% CI = [2980.1, 3010.3]
+    LIFE-CYCLE: mean = 3001.5, SD = 10.8, 95% CI = [2987.4, 3015.6]
+    t-test p-value = 0.4231
+    Mann–Whitney p-value = 0.4150
 
 
 **final_rabbits**
-BASELINE: mean = 5.2, SD = 7.8, 95% CI = [2.1, 8.3]
-LIFE-CYCLE: mean = 6.5, SD = 8.1, 95% CI = [3.3, 9.7]
-t-test p-value = 0.6125
-Mann–Whitney p-value = 0.5782
+
+    BASELINE: mean = 5.2, SD = 7.8, 95% CI = [2.1, 8.3]
+    LIFE-CYCLE: mean = 6.5, SD = 8.1, 95% CI = [3.3, 9.7]
+    t-test p-value = 0.6125
+    Mann–Whitney p-value = 0.5782
 
 
 **final_foxes**
-BASELINE: mean = 4.8, SD = 6.5, 95% CI = [1.9, 7.7]
-LIFE-CYCLE: mean = 3.9, SD = 6.9, 95% CI = [1.0, 6.8]
-t-test p-value = 0.7320
-Mann–Whitney p-value = 0.6891
+
+    BASELINE: mean = 4.8, SD = 6.5, 95% CI = [1.9, 7.7]
+    LIFE-CYCLE: mean = 3.9, SD = 6.9, 95% CI = [1.0, 6.8]
+    t-test p-value = 0.7320
+    Mann–Whitney p-value = 0.6891
 
 
 **max_rabbits**
-BASELINE: mean = 98.7, SD = 2.5, 95% CI = [97.8, 99.6]
-LIFE-CYCLE: mean = 100.2, SD = 1.9, 95% CI = [99.6, 100.8]
-t-test p-value = 0.0145
-Mann–Whitney p-value = 0.0162
+
+    BASELINE: mean = 98.7, SD = 2.5, 95% CI = [97.8, 99.6]
+    LIFE-CYCLE: mean = 100.2, SD = 1.9, 95% CI = [99.6, 100.8]
+    t-test p-value = 0.0145
+    Mann–Whitney p-value = 0.0162
 
 
 **max_foxes**
-BASELINE: mean = 26.8, SD = 4.5, 95% CI = [24.3, 29.3]
-LIFE-CYCLE: mean = 22.1, SD = 3.8, 95% CI = [20.1, 24.1]
-t-test p-value = 0.0018
-Mann–Whitney p-value = 0.0021
+
+    BASELINE: mean = 26.8, SD = 4.5, 95% CI = [24.3, 29.3]
+    LIFE-CYCLE: mean = 22.1, SD = 3.8, 95% CI = [20.1, 24.1]
+    t-test p-value = 0.0018
+    Mann–Whitney p-value = 0.0021
 
 
 **min_rabbits**
-BASELINE: mean = 0.8, SD = 1.1, 95% CI = [–0.1, 1.7]
-LIFE-CYCLE: mean = 1.2, SD = 1.4, 95% CI = [0.1, 2.3]
-t-test p-value = 0.3287
-Mann–Whitney p-value = 0.3452
+
+    BASELINE: mean = 0.8, SD = 1.1, 95% CI = [–0.1, 1.7]
+    LIFE-CYCLE: mean = 1.2, SD = 1.4, 95% CI = [0.1, 2.3]
+    t-test p-value = 0.3287
+    Mann–Whitney p-value = 0.3452
 
 
 **min_foxes**
-BASELINE: mean = 0.6, SD = 0.9, 95% CI = [–0.1, 1.3]
-LIFE-CYCLE: mean = 0.3, SD = 0.7, 95% CI = [–0.2, 0.8]
-t-test p-value = 0.2543
-Mann–Whitney p-value = 0.2690
+
+    BASELINE: mean = 0.6, SD = 0.9, 95% CI = [–0.1, 1.3]
+    LIFE-CYCLE: mean = 0.3, SD = 0.7, 95% CI = [–0.2, 0.8]
+    t-test p-value = 0.2543
+    Mann–Whitney p-value = 0.2690
 
 
 ## Interpretation
