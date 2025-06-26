@@ -6,6 +6,7 @@ import matplotlib
 matplotlib.use('Agg')  # Use non-interactive backend to avoid Tkinter issues
 import matplotlib.pyplot as plt
 import pandas as pd
+import os
 
 @dataclass
 class LotkaVolterraConfig(Config):
@@ -66,7 +67,7 @@ class PopulationTracker:
             return True
         return False
 
-    def plot(self):
+    def plot(self,  run_id=None):
         """Create simple population dynamics plot"""
         if not self.data:
             print("No data to plot!")
@@ -86,8 +87,14 @@ class PopulationTracker:
         plt.grid(True, alpha=0.3)
 
         plt.tight_layout()
-        plt.savefig('population_dynamics_lifecycle.png', dpi=300, bbox_inches='tight')
-        print("Plot saved as 'population_dynamics_lifecycle.png'")
+
+        # Add run number to filename
+        fname = f"population_dynamics_run_{run_id}.png" if run_id is not None else "population_dynamics.png"
+        OUTPUT_DIR = "results/lifecycle-2"
+        out_path = os.path.join(OUTPUT_DIR, fname)
+        plt.savefig(out_path, dpi=300, bbox_inches='tight')
+        # print("Plot saved as 'population_dynamics_lifecycle.png'")
+        print(f"Plot saved as '{out_path}'")
         plt.close()
 
         # Print basic statistics
@@ -112,6 +119,11 @@ class Rabbit(Agent):
         self.move = Vector2(1, 0).rotate(angle) * self.config.movement_speed
 
     def change_position(self):
+         # Force‐kill anyone who reaches max_age
+        if self.age >= self.config.max_age:
+            self.kill()
+            return
+        
         # Age the rabbit much slower
         if random.random() < 0.1:  # Age every 10 ticks instead of 2
             self.age += 1
@@ -244,8 +256,9 @@ class Fox(Agent):
 
 
 class LotkaVolterraSimulation(Simulation):
-    def __init__(self, config):
+    def __init__(self, config, run_id):
         super().__init__(config)
+        self.run_id = run_id
         self.tracker = PopulationTracker()
         self.current_step = 0
         self.simulation_ended = False
@@ -256,7 +269,7 @@ class LotkaVolterraSimulation(Simulation):
             extinct = self.tracker.record(self)
             if extinct and not self.simulation_ended:
                 print("Population extinct! Generating plot...")
-                self.tracker.plot()
+                self.tracker.plot(run_id=self.run_id)
                 self.simulation_ended = True
 
         # Call parent tick but skip metrics if they cause issues
@@ -275,7 +288,7 @@ class LotkaVolterraSimulation(Simulation):
         super().end()
         if not self.simulation_ended:
             print("\nSimulation ended normally. Generating plot...")
-            self.tracker.plot()
+            self.tracker.plot(run_id=self.run_id)
 
 
 # Run simulation with sexual reproduction and aging
@@ -301,7 +314,7 @@ if __name__ == "__main__":
             enable_recording=False
         )
 
-        simulation = LotkaVolterraSimulation(config)
+        simulation = LotkaVolterraSimulation(config, run_id=run)
         simulation.batch_spawn_agents(100, Rabbit, images=["images/rabbit.png"])
         simulation.batch_spawn_agents(20, Fox, images=["images/fox.png"])
         simulation.run()
@@ -326,5 +339,8 @@ if __name__ == "__main__":
     stats_df = pd.DataFrame(all_stats)
     print("\n=== Summary Statistics ===")
     print(stats_df.describe())
-    stats_df.to_csv("life_cycle_results.csv", index=False)
-    print("Saved summary to 'life_cycle_results.csv'")
+    fname = "life_cycle_results.csv"
+    OUTPUT_DIR = "results/lifecycle-2"
+    out_csv = os.path.join(OUTPUT_DIR, fname)
+    stats_df.to_csv(out_csv, index=False)
+    print(f"Saved summary to '{out_csv}'")
