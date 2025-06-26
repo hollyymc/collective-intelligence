@@ -21,6 +21,7 @@ class PopulationTracker:
     def __init__(self):
         self.data = []
         self.step = 0
+        self.summary = {}
 
     def record(self, simulation):
         """Record current population counts"""
@@ -70,8 +71,9 @@ class PopulationTracker:
         plt.grid(True, alpha=0.3)
 
         plt.tight_layout()
-        plt.savefig('population_dynamics.png', dpi=300, bbox_inches='tight')
-        print("Plot saved as 'population_dynamics.png'")
+        filename= f'population_dynamics_run_{self.run_id or "unknown"}.png'
+        plt.savefig(filename, dpi=300, bbox_inches='tight')
+        print(f"Plot saved as '{filename}'")
         plt.show()
 
         # Print basic statistics
@@ -79,6 +81,19 @@ class PopulationTracker:
         print(f"Duration: {len(df)} time steps")
         print(f"Rabbits - Max: {df['rabbits'].max()}, Min: {df['rabbits'].min()}, Final: {df['rabbits'].iloc[-1]}")
         print(f"Foxes - Max: {df['foxes'].max()}, Min: {df['foxes'].min()}, Final: {df['foxes'].iloc[-1]}")
+
+    def create_summary(self):
+        df = pd.DataFrame(self.data)
+        self.summary["steps_survived"] = len(df)
+        self.summary["final_rabbits"] = df['rabbits'].iloc[-1]
+        self.summary["final_foxes"] = df['foxes'].iloc[-1]
+        self.summary["max_rabbits"] = df['rabbits'].max()
+        self.summary["max_foxes"] = df['foxes'].max()
+        self.summary["min_rabbits"] = df['rabbits'].min()
+        self.summary["min_foxes"] = df['foxes'].min()
+
+    def get_summary(self):
+        return self.summary
 
 
 class Rabbit(Agent):
@@ -162,6 +177,7 @@ class LotkaVolterraSimulation(Simulation):
             if extinct and not self.simulation_ended:
                 print("Population extinct! Generating plot...")
                 self.tracker.plot()
+                self.tracker.create_summary()
                 self.simulation_ended = True
 
         super().tick()
@@ -172,11 +188,12 @@ class LotkaVolterraSimulation(Simulation):
         if not self.simulation_ended:
             print("\nSimulation ended normally. Generating plot...")
             self.tracker.plot()
+            self.tracker.create_summary()
 
 
-# Run simulation with population tracking
-if __name__ == "__main__":
-    print("Starting Lotka-Volterra simulation with population tracking...")
+def run_simulation_once(seed=None):
+    if seed is not None:
+        random.seed(seed)
 
     config = LotkaVolterraConfig(
         movement_speed=2.0,
@@ -184,7 +201,7 @@ if __name__ == "__main__":
         fox_death_prob=0.01,
         fox_hunt_radius=40,
         rabbit_reproduction_prob=0.005,
-        duration=1000,
+        duration=15000,
         fox_start_energy=0,
         fox_energy_gain_on_eat=0
     )
@@ -194,7 +211,27 @@ if __name__ == "__main__":
     simulation.batch_spawn_agents(10, Fox, images=["images/fox.png"])
     simulation.run()
 
-    # Ensure plot is generated even if end() wasn't called
-    if not simulation.simulation_ended:
-        print("Generating final plot...")
-        simulation.tracker.plot()
+    return simulation.tracker.get_summary()
+
+# Run simulation with population tracking
+if __name__ == "__main__":
+    print("Starting Lotka-Volterra simulation with population tracking...")
+
+    num_runs = 27
+    results = []
+
+    for i in range(num_runs):
+        print(f"\n--- Simulation {i + 1} ---")
+        summary = run_simulation_once(seed=i)
+        summary['run'] = i + 1
+        results.append(summary)
+
+    # create df and save
+    df_results = pd.DataFrame(results)
+    df_results.to_csv("baseline_results.csv", index=False)
+    print("\nSaved all run results to 'baseline_results.csv'.")
+
+
+    #simulation.run()
+
+
