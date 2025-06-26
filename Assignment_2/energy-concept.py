@@ -207,27 +207,53 @@ class LotkaVolterraSimulation(Simulation):
 if __name__ == "__main__":
     print("Starting Lotka-Volterra simulation with population tracking...")
 
-    config = LotkaVolterraConfig(
-        movement_speed=2.0,
-        radius=50,
-        fox_death_prob=0.01,
-        fox_hunt_radius=40,
-        rabbit_reproduction_prob=0.005,
-        duration=1000,
-        fox_start_energy=0,
-        fox_energy_gain_on_eat=0,
-        rabbit_start_energy=0,
-        rabbit_energy_gain_on_eat=0,
-        rabbit_feed_radius=10
-    )
+    all_stats = []
 
-    simulation = LotkaVolterraSimulation(config)
-    simulation.batch_spawn_agents(50, Rabbit, images=["images/rabbit.png"])
-    simulation.batch_spawn_agents(10, Fox, images=["images/fox.png"])
-    simulation.batch_spawn_agents(30, Grass, images=["images/grass.png"])
-    simulation.run()
+    for run in range(1, 26):  # run 25 simulations
+        print(f"\n=== Starting Simulation {run} ===")
 
-    # Ensure plot is generated even if end() wasn't called
-    if not simulation.simulation_ended:
-        print("Generating final plot...")
-        simulation.tracker.plot()
+        config = LotkaVolterraConfig(
+            movement_speed=2.0,
+            radius=50,
+            fox_death_prob=0.01,
+            fox_hunt_radius=40,
+            rabbit_reproduction_prob=0.005,
+            duration=15000,
+            fox_start_energy=0,
+            fox_energy_gain_on_eat=0,
+            rabbit_start_energy=0,
+            rabbit_energy_gain_on_eat=0,
+            rabbit_feed_radius=10
+        )
+
+        simulation = LotkaVolterraSimulation(config)
+        simulation.batch_spawn_agents(50, Rabbit, images=["images/rabbit.png"])
+        simulation.batch_spawn_agents(10, Fox, images=["images/fox.png"])
+        simulation.batch_spawn_agents(30, Grass, images=["images/grass.png"])
+        simulation.run()
+
+        df = pd.DataFrame(simulation.tracker.data)
+        if df.empty:
+            print(f"Run {run}: No data collected, skipping.")
+            continue
+
+        stats = {
+            "run": run,
+            "steps_survived": len(df),
+            "final_rabbits": df['rabbits'].iloc[-1],
+            "final_foxes": df['foxes'].iloc[-1],
+            "max_rabbits": df['rabbits'].max(),
+            "max_foxes": df['foxes'].max(),
+            "min_rabbits": df['rabbits'].min(),
+            "min_foxes": df['foxes'].min(),
+        }
+        all_stats.append(stats)
+
+    # Combine all runs into a DataFrame and describe
+    stats_df = pd.DataFrame(all_stats)
+    print("\n=== Summary Statistics ===")
+    print(stats_df.describe())
+    stats_df.to_csv("energy_results.csv", index=False)
+    print("Saved summary to 'energy_results.csv'")
+
+
