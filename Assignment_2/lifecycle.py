@@ -280,28 +280,51 @@ class LotkaVolterraSimulation(Simulation):
 
 # Run simulation with sexual reproduction and aging
 if __name__ == "__main__":
-    print("Starting Lotka-Volterra simulation with sexual reproduction and aging...")
+    print("Starting Lotka-Volterra simulations with sexual reproduction and aging...")
 
-    config = LotkaVolterraConfig(
-        movement_speed=2.0,
-        fox_death_prob=0.0005,  # Reduced death probability
-        fox_hunt_radius=50,
-        rabbit_reproduction_prob=0.01,  # Reduced 
-        fox_reproduction_prob=0.05,    # Reduced
-        mating_radius=40.0,  # Larger mating radius
-        fox_start_energy=0,
-        fox_energy_gain_on_eat=0,
-        max_age=200,
-        enable_logging=False,  # Disable metrics
-        enable_recording=False
-    )
+    all_stats = []
 
-    simulation = LotkaVolterraSimulation(config)
-    simulation.batch_spawn_agents(100, Rabbit, images=["images/rabbit.png"])  
-    simulation.batch_spawn_agents(20, Fox, images=["images/fox.png"])        
-    simulation.run()
+    for run in range(1, 26):  # run 25 simulations
+        print(f"\n=== Starting Simulation {run} ===")
 
-    # Ensure plot is generated even if end() wasn't called
-    if not simulation.simulation_ended:
-        print("Generating final plot...")
-        simulation.tracker.plot()
+        config = LotkaVolterraConfig(
+            movement_speed=2.0,
+            fox_death_prob=0.0005,  # Reduced death probability
+            fox_hunt_radius=50,
+            rabbit_reproduction_prob=0.01,  # Reduced
+            fox_reproduction_prob=0.05,    # Reduced
+            mating_radius=40.0,  # Larger mating radius
+            fox_start_energy=0,
+            fox_energy_gain_on_eat=0,
+            max_age=200,
+            enable_logging=False,  # Disable metrics
+            enable_recording=False
+        )
+
+        simulation = LotkaVolterraSimulation(config)
+        simulation.batch_spawn_agents(100, Rabbit, images=["images/rabbit.png"])
+        simulation.batch_spawn_agents(20, Fox, images=["images/fox.png"])
+        simulation.run()
+
+        df = pd.DataFrame(simulation.tracker.data)
+        if df.empty:
+            print(f"Run {run}: No data collected, skipping.")
+            continue
+
+        stats = {
+            "run": run,
+            "steps_survived": len(df),
+            "final_rabbits": df['rabbits'].iloc[-1],
+            "final_foxes": df['foxes'].iloc[-1],
+            "max_rabbits": df['rabbits'].max(),
+            "max_foxes": df['foxes'].max(),
+            "min_rabbits": df['rabbits'].min(),
+            "min_foxes": df['foxes'].min(),
+        }
+        all_stats.append(stats)
+
+    stats_df = pd.DataFrame(all_stats)
+    print("\n=== Summary Statistics ===")
+    print(stats_df.describe())
+    stats_df.to_csv("life_cycle_results.csv", index=False)
+    print("Saved summary to 'life_cycle_results.csv'")

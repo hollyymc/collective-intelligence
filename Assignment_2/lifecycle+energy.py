@@ -366,3 +366,69 @@ if __name__ == "__main__":
     if not simulation.simulation_ended:
         print("Generating final plot...")
         simulation.tracker.plot()
+
+
+def run_multiple_simulations(n_runs=10):
+    all_results = []
+
+    for run in range(n_runs):
+        print(f"\n--- Running simulation {run + 1}/{n_runs} ---")
+
+        config = LotkaVolterraConfig(
+            movement_speed=2.0,
+            fox_death_prob=0.0005,
+            fox_hunt_radius=50,
+            rabbit_reproduction_prob=0.01,
+            fox_reproduction_prob=0.05,
+            mating_radius=40.0,
+            fox_start_energy=1000,
+            fox_energy_gain_on_eat=500,
+            rabbit_start_energy=800,
+            rabbit_energy_gain_on_eat=400,
+            rabbit_feed_radius=15,
+            grass_reproduction_prob=0.01,
+            max_age=200,
+            enable_logging=False,
+            enable_recording=False,
+            duration=1000
+        )
+
+        sim = LotkaVolterraSimulation(config)
+        sim.batch_spawn_agents(100, Rabbit, images=["images/rabbit.png"])
+        sim.batch_spawn_agents(20, Fox, images=["images/fox.png"])
+        sim.batch_spawn_agents(50, Grass, images=["images/grass.png"])
+        sim.run()
+
+        # Extract population data
+        df = pd.DataFrame(sim.tracker.data)
+        steps_survived = len(df)
+        final_rabbits = df['rabbits'].iloc[-1]
+        final_foxes = df['foxes'].iloc[-1]
+        max_rabbits = df['rabbits'].max()
+        max_foxes = df['foxes'].max()
+        min_rabbits = df['rabbits'].min()
+        min_foxes = df['foxes'].min()
+
+        all_results.append({
+            'run': run + 1,
+            'steps_survived': steps_survived,
+            'final_rabbits': final_rabbits,
+            'final_foxes': final_foxes,
+            'max_rabbits': max_rabbits,
+            'max_foxes': max_foxes,
+            'min_rabbits': min_rabbits,
+            'min_foxes': min_foxes,
+        })
+
+    # Convert to DataFrame and print stats
+    summary_df = pd.DataFrame(all_results)
+    print("\n=== Summary Statistics ===")
+    print(summary_df.describe())
+
+    # Save for later comparison
+    summary_df.to_csv("lv_lifecycle_summary.csv", index=False)
+
+
+# Only run this if this is the main script
+if __name__ == "__main__":
+    run_multiple_simulations(n_runs=10)
