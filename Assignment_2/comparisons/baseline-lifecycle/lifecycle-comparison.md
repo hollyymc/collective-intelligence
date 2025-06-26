@@ -1,5 +1,6 @@
 # Comparative Analysis of Baseline vs. Life-Cycle Predator–Prey Simulations
 
+## RQ How does adding a lifecycle to a predator-prey model affect population dynamics compared to the baseline predator-prey model?
 ## Hypotheses
 
 - **H₀:** Introducing a life-cycle (aging, sexual reproduction, max_age) into the Lotka–Volterra model does **not** significantly change population dynamics compared to the baseline model.  
