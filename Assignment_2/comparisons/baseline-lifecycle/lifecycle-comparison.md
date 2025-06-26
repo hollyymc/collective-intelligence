@@ -22,34 +22,34 @@
 ## Parameters
 
 ### Baseline model
-duration: 15 000 steps
-movement_speed: 2.0
-fox_hunt_radius: 10
-rabbit_reproduction_prob: 0.005
-fox_death_prob: 0.01
-fox_start_energy: 0
-fox_energy_gain_on_eat: 0
+    duration: 15 000 steps
+    movement_speed: 2.0
+    fox_hunt_radius: 10
+    rabbit_reproduction_prob: 0.005
+    fox_death_prob: 0.01
+    fox_start_energy: 0
+    fox_energy_gain_on_eat: 0
 
 
 ### Life-Cycle model
-duration: 15 000 steps
-movement_speed: 2.0
-fox_hunt_radius: 50.0
-rabbit_reproduction_prob: 0.01 * age-based value
-    - Age < 10: 0
-    - Age 10–80: 0.5
-    - Age > 80: 0.25
-fox_death_prob: 0.0005 * age_death_prob
-    - age_death_prob = min(0.002, age/max_age * 0.02)
-fox_start_energy: 0
-fox_energy_gain_on_eat: 0
-max_age: 200
-mating_radius: 40
-fox_reproduction_prob: 0.05 * age-based value
-    - Age < 10: 0
-    - Age 10–100: 0.5
-    - Age > 100: 0.25
-aging_frequency: ~0.10 chance per tick to age 1 year (≈1 year every 10 ticks)
+    duration: 15 000 steps
+    movement_speed: 2.0
+    fox_hunt_radius: 50.0
+    rabbit_reproduction_prob: 0.01 * age-based value
+        - Age < 10: 0
+        - Age 10–80: 0.5
+        - Age > 80: 0.25
+    fox_death_prob: 0.0005 * age_death_prob
+        - age_death_prob = min(0.002, age/max_age * 0.02)
+    fox_start_energy: 0
+    fox_energy_gain_on_eat: 0
+    max_age: 200
+    mating_radius: 40
+    fox_reproduction_prob: 0.05 * age-based value
+        - Age < 10: 0
+        - Age 10–100: 0.5
+        - Age > 100: 0.25
+    aging_frequency: ~0.10 chance per tick to age 1 year (≈1 year every 10 ticks)
 
 
 ## Results
