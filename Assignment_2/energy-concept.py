@@ -13,9 +13,9 @@ class LotkaVolterraConfig(Config):
     movement_speed: float = 2.0
     rabbit_reproduction_prob: float = 0.005
     fox_start_energy: int = 0
-    fox_energy_gain_on_eat: int = 0
+    fox_energy_gain_on_eat: int = 2
     rabbit_start_energy: int = 0
-    rabbit_energy_gain_on_eat: int = 0
+    rabbit_energy_gain_on_eat: int = 2
     rabbit_feed_radius: int = 10
     grass_reproduction_prob: float = 0.005
     duration: int = 15000  # Simulation duration in steps
@@ -219,10 +219,10 @@ if __name__ == "__main__":
             fox_hunt_radius=40,
             rabbit_reproduction_prob=0.005,
             duration=15000,
-            fox_start_energy=0,
-            fox_energy_gain_on_eat=0,
-            rabbit_start_energy=0,
-            rabbit_energy_gain_on_eat=0,
+            fox_start_energy=5,
+            fox_energy_gain_on_eat=2,
+            rabbit_start_energy=5,
+            rabbit_energy_gain_on_eat=2,
             rabbit_feed_radius=10
         )
 
